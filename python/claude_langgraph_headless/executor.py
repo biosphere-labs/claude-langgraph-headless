@@ -137,7 +137,16 @@ class ClaudeHeadlessExecutor:
 
     def execute_sync(self, input_data: ClaudeHeadlessInput) -> ClaudeHeadlessOutput:
         """Synchronous execute wrapper"""
-        return asyncio.run(self.execute(input_data))
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # Already in an event loop, use run_until_complete
+                return loop.run_until_complete(self.execute(input_data))
+            else:
+                return asyncio.run(self.execute(input_data))
+        except RuntimeError:
+            # No event loop, create new one
+            return asyncio.run(self.execute(input_data))
 
 
 class ClaudeHeadlessNode:
