@@ -228,9 +228,4 @@ export class ClaudeHeadlessNode {
   }
 }
 
-// Export types
-export type {
-  ClaudeHeadlessOptions,
-  ClaudeHeadlessInput,
-  ClaudeHeadlessOutput,
-};
+// Types are already exported above via interface declarations
