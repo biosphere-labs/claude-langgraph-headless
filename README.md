@@ -1,13 +1,16 @@
 # Claude LangGraph Headless
 
-A robust, reusable LangGraph node for calling Claude Code in headless mode. Available in both **TypeScript** and **Python**.
+A robust, reusable LangGraph node for calling Claude Code in headless/programmatic mode **using your Claude subscription**. Available in both **TypeScript** and **Python**.
+
+**Key Feature**: Make headless API calls to Claude without using API credits - uses your Claude subscription instead!
 
 ## Features
 
+- 💳 **Subscription Billing** - Make programmatic calls using your Claude subscription (no API key credits required)
 - 🚀 **Robust Process Management** - Uses `spawn()`/`Popen()` for better control
 - 📝 **Large Prompt Support** - Uses stdin for prompts of any size (no command-line limits)
 - 🔄 **Automatic Retries** - Configurable retry logic with exponential backoff
-- 🔐 **Auth Management** - Automatically uses subscription instead of API billing
+- 🔐 **Smart Auth** - Automatically uses subscription instead of API billing via `--settings` flag
 - ⚙️ **Configurable** - Timeout, buffer size, output format, retries
 - 🧪 **Well Tested** - Comprehensive test suites for both languages
 - 📦 **LangGraph Ready** - Drop-in node for your workflows
@@ -171,9 +174,23 @@ app = workflow.compile()
 - ✅ **Buffer overflow protection** - Configurable max buffer size
 - ✅ **Better error reporting** - Captures stderr separately
 
-### Authentication Strategy
+### Authentication Strategy - Subscription Mode
 
-The package automatically uses your Claude subscription instead of API billing by unsetting `ANTHROPIC_API_KEY` in the child process environment when `useSubscription: true`.
+This package enables **programmatic/headless Claude calls using your subscription** instead of API credits.
+
+**How it works:**
+1. Uses `claude -p` (headless mode) with the `--settings` flag
+2. Passes `{"env": {"ANTHROPIC_API_KEY": ""}}` to force subscription authentication
+3. Claude Code uses OAuth credentials from `~/.claude/.credentials.json` instead of API keys
+4. All costs are billed to your Claude subscription, not API credits
+
+**Why this matters:**
+- No need to manage API keys with credits
+- Use your existing Claude subscription for automation
+- Perfect for LangGraph workflows and batch processing
+- Same billing as interactive Claude Code sessions
+
+When `useSubscription: true` (default), the package automatically configures this for you.
 
 ## Error Handling
 
