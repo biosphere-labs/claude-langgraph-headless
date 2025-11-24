@@ -1,15 +1,13 @@
 {
-  "name": "@biosphere-labs/claude-headless-subscription",
+  "name": "claude-headless-subscription",
   "version": "1.0.0",
-  "description": "Use Claude Code programmatically via subscription instead of expensive API credits - TypeScript and Python",
+  "description": "Use Claude Code programmatically via subscription instead of expensive API credits",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/biosphere-labs/claude-headless-subscription.git"
-  },
-  "publishConfig": {
-    "@biosphere-labs:registry": "https://npm.pkg.github.com"
+    "url": "https://github.com/biosphere-labs/claude-headless-subscription.git",
+    "directory": "typescript"
   },
   "scripts": {
     "build": "tsc",

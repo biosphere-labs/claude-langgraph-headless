@@ -1,6 +1,8 @@
 # Claude Headless Subscription
 
-**Use Claude Code programmatically via your subscription instead of expensive API credits.** Available in TypeScript and Python.
+**Use Claude Code programmatically via your subscription instead of expensive API credits.**
+
+> 💡 **Available in both TypeScript and Python** - See installation instructions below
 
 ## Why This Exists
 
@@ -8,15 +10,23 @@ Claude API credits are expensive. This package lets you make **headless/programm
 
 **Key insight**: Claude Code can authenticate via OAuth (subscription) instead of API keys when using the `--settings` flag with an empty API key. This package automates that for you.
 
-## Quick Start
+## Installation
 
-### TypeScript
+### TypeScript (npm)
 ```bash
-npm install @biosphere-labs/claude-headless-subscription
+npm install claude-headless-subscription
 ```
 
+### Python (PyPI)
+```bash
+pip install claude-headless-subscription
+```
+
+## Quick Start
+
+### TypeScript Example
 ```typescript
-import { ClaudeHeadlessNode } from '@biosphere-labs/claude-headless-subscription';
+import { ClaudeHeadlessNode } from 'claude-headless-subscription';
 
 const claude = new ClaudeHeadlessNode({
   useSubscription: true,  // Uses subscription billing
@@ -29,11 +39,7 @@ const result = await claude.invoke({
 });
 ```
 
-### Python
-```bash
-pip install claude-headless-subscription
-```
-
+### Python Example
 ```python
 from claude_headless_subscription import ClaudeHeadlessNode, ClaudeHeadlessOptions, ClaudeHeadlessInput
 
@@ -81,7 +87,7 @@ Works seamlessly as a LangGraph node:
 
 ```typescript
 import { StateGraph } from "@langchain/langgraph";
-import { ClaudeHeadlessNode } from '@biosphere-labs/claude-headless-subscription';
+import { ClaudeHeadlessNode } from 'claude-headless-subscription';
 
 const claude = new ClaudeHeadlessNode({ useSubscription: true });
 
@@ -111,6 +117,22 @@ Claude subscription, Claude headless mode, Claude programmatic access, Claude wi
 ## License
 
 MIT
+
+## Repository Structure
+
+```
+claude-headless-subscription/
+├── typescript/          # TypeScript/npm package
+│   ├── src/
+│   ├── tests/
+│   └── package.json
+└── python/             # Python/PyPI package
+    ├── claude_headless_subscription/
+    ├── tests/
+    └── setup.py
+```
+
+Both implementations are feature-complete and maintained in parallel.
 
 ## Contributing
 
