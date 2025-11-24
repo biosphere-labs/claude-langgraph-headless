@@ -1,69 +1,50 @@
-# Claude LangGraph Headless
+# Claude Headless Subscription
 
-A robust, reusable LangGraph node for calling Claude Code in headless/programmatic mode **using your Claude subscription**. Available in both **TypeScript** and **Python**.
+**Use Claude Code programmatically via your subscription instead of expensive API credits.** Available in TypeScript and Python.
 
-**Key Feature**: Make headless API calls to Claude without using API credits - uses your Claude subscription instead!
+## Why This Exists
 
-## Features
+Claude API credits are expensive. This package lets you make **headless/programmatic calls to Claude using your Claude subscription** instead of API keys - potentially saving hundreds of dollars.
 
-- 💳 **Subscription Billing** - Make programmatic calls using your Claude subscription (no API key credits required)
-- 🚀 **Robust Process Management** - Uses `spawn()`/`Popen()` for better control
-- 📝 **Large Prompt Support** - Uses stdin for prompts of any size (no command-line limits)
-- 🔄 **Automatic Retries** - Configurable retry logic with exponential backoff
-- 🔐 **Smart Auth** - Automatically uses subscription instead of API billing via `--settings` flag
-- ⚙️ **Configurable** - Timeout, buffer size, output format, retries
-- 🧪 **Well Tested** - Comprehensive test suites for both languages
-- 📦 **LangGraph Ready** - Drop-in node for your workflows
-
-## Installation
-
-### TypeScript
-```bash
-npm install @biosphere-labs/claude-langgraph-headless
-```
-
-### Python
-```bash
-pip install claude-langgraph-headless
-```
+**Key insight**: Claude Code can authenticate via OAuth (subscription) instead of API keys when using the `--settings` flag with an empty API key. This package automates that for you.
 
 ## Quick Start
 
 ### TypeScript
+```bash
+npm install @biosphere-labs/claude-headless-subscription
+```
 
 ```typescript
-import { ClaudeHeadlessNode } from '@biosphere-labs/claude-langgraph-headless';
+import { ClaudeHeadlessNode } from '@biosphere-labs/claude-headless-subscription';
 
-// Create a LangGraph node
-const claudeNode = new ClaudeHeadlessNode({
-  outputFormat: 'json',
-  timeout: 180000,
-  useSubscription: true
+const claude = new ClaudeHeadlessNode({
+  useSubscription: true,  // Uses subscription billing
+  outputFormat: 'json'
 });
 
-// Use in your LangGraph workflow
-const result = await claudeNode.invoke({
+const result = await claude.invoke({
   systemPrompt: "You are a helpful assistant.",
   userPrompt: "Analyze this data..."
 });
 ```
 
 ### Python
+```bash
+pip install claude-headless-subscription
+```
 
 ```python
-from claude_langgraph_headless import ClaudeHeadlessNode, ClaudeHeadlessOptions, ClaudeHeadlessInput
+from claude_headless_subscription import ClaudeHeadlessNode, ClaudeHeadlessOptions, ClaudeHeadlessInput
 
-# Create a LangGraph node
-claude_node = ClaudeHeadlessNode(
+claude = ClaudeHeadlessNode(
     ClaudeHeadlessOptions(
-        output_format="json",
-        timeout=180,
-        use_subscription=True
+        use_subscription=True,  # Uses subscription billing
+        output_format="json"
     )
 )
 
-# Use in your LangGraph workflow
-result = await claude_node.ainvoke(
+result = await claude.ainvoke(
     ClaudeHeadlessInput(
         system_prompt="You are a helpful assistant.",
         user_prompt="Analyze this data..."
@@ -71,162 +52,61 @@ result = await claude_node.ainvoke(
 )
 ```
 
+## How It Works
+
+1. Uses `claude -p` (headless mode) with `--settings {"env": {"ANTHROPIC_API_KEY": ""}}`
+2. Forces Claude Code to use OAuth credentials from `~/.claude/.credentials.json`
+3. All costs billed to your Claude subscription, not API credits
+
+## Use Cases
+
+- **Automation workflows** - Build AI pipelines without API costs
+- **Batch processing** - Process large datasets affordably
+- **LangGraph integration** - Drop-in node for AI workflows
+- **Development/testing** - Iterate without burning through credits
+- **Personal projects** - Use your existing subscription
+
 ## Configuration
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `outputFormat` | `'text' \| 'json' \| 'stream-json'` | `'json'` | Claude output format |
-| `timeout` | `number` | `180000`ms (TS)<br>`180`s (Python) | Max execution time |
-| `maxBuffer` | `number` | `10MB` | Max stdout buffer size |
-| `useSubscription` | `boolean` | `true` | Use subscription vs API billing |
-| `retries` | `number` | `0` | Number of retry attempts |
+| `useSubscription` | boolean | `true` | Use subscription vs API billing |
+| `outputFormat` | string | `'json'` | `'text'`, `'json'`, or `'stream-json'` |
+| `timeout` | number | `180000`ms / `180`s | Max execution time |
+| `retries` | number | `0` | Retry attempts on failure |
 
-## LangGraph Integration Example
+## LangGraph Integration
 
-### TypeScript with LangGraph
+Works seamlessly as a LangGraph node:
 
 ```typescript
 import { StateGraph } from "@langchain/langgraph";
-import { ClaudeHeadlessNode } from '@biosphere-labs/claude-langgraph-headless';
+import { ClaudeHeadlessNode } from '@biosphere-labs/claude-headless-subscription';
 
-// Define your state
-interface WorkflowState {
-  input: string;
-  result?: string;
-}
+const claude = new ClaudeHeadlessNode({ useSubscription: true });
 
-// Create the Claude node
-const claudeNode = new ClaudeHeadlessNode({
-  outputFormat: 'json',
-  timeout: 180000,
-  useSubscription: true
-});
-
-// Build your workflow
-const workflow = new StateGraph<WorkflowState>({
-  channels: {
-    input: null,
-    result: null
-  }
-});
-
-workflow.addNode("analyze", async (state: WorkflowState) => {
-  const response = await claudeNode.invoke({
+const workflow = new StateGraph({ /* ... */ });
+workflow.addNode("analyze", async (state) => {
+  return await claude.invoke({
     systemPrompt: "You are a data analyst.",
     userPrompt: state.input
   });
-  return { ...state, result: response.result };
 });
-
-workflow.setEntryPoint("analyze");
-workflow.setFinishPoint("analyze");
-
-const app = workflow.compile();
 ```
-
-### Python with LangGraph
-
-```python
-from langgraph.graph import StateGraph
-from typing import TypedDict
-from claude_langgraph_headless import ClaudeHeadlessNode, ClaudeHeadlessOptions, ClaudeHeadlessInput
-
-# Define your state
-class WorkflowState(TypedDict):
-    input: str
-    result: str
-
-# Create the Claude node
-claude_node = ClaudeHeadlessNode(
-    ClaudeHeadlessOptions(
-        output_format="json",
-        timeout=180,
-        use_subscription=True
-    )
-)
-
-# Define node function
-async def analyze(state: WorkflowState) -> WorkflowState:
-    response = await claude_node.ainvoke(
-        ClaudeHeadlessInput(
-            system_prompt="You are a data analyst.",
-            user_prompt=state["input"]
-        )
-    )
-    return {"result": response["result"]}
-
-# Build workflow
-workflow = StateGraph(WorkflowState)
-workflow.add_node("analyze", analyze)
-workflow.set_entry_point("analyze")
-workflow.set_finish_point("analyze")
-
-app = workflow.compile()
-```
-
-## Architecture
-
-### Why `spawn()`/`Popen()` instead of `exec()`?
-
-- ✅ **No command-line length limits** - Prompts sent via stdin using temp files
-- ✅ **Better stream control** - Separate handling of stdin/stdout/stderr
-- ✅ **Proper timeout handling** - Graceful termination with forced kill fallback
-- ✅ **Buffer overflow protection** - Configurable max buffer size
-- ✅ **Better error reporting** - Captures stderr separately
-
-### Authentication Strategy - Subscription Mode
-
-This package enables **programmatic/headless Claude calls using your subscription** instead of API credits.
-
-**How it works:**
-1. Uses `claude -p` (headless mode) with the `--settings` flag
-2. Passes `{"env": {"ANTHROPIC_API_KEY": ""}}` to force subscription authentication
-3. Claude Code uses OAuth credentials from `~/.claude/.credentials.json` instead of API keys
-4. All costs are billed to your Claude subscription, not API credits
-
-**Why this matters:**
-- No need to manage API keys with credits
-- Use your existing Claude subscription for automation
-- Perfect for LangGraph workflows and batch processing
-- Same billing as interactive Claude Code sessions
-
-When `useSubscription: true` (default), the package automatically configures this for you.
-
-## Error Handling
-
-The package handles:
-- **Timeouts** - Graceful termination with configurable timeout
-- **Credit balance errors** - Detects low credit balance from Claude output
-- **Buffer overflows** - Prevents memory issues with large outputs
-- **Process failures** - Captures exit codes and stderr
-- **Retry logic** - Optional exponential backoff retries
-
-## Testing
-
-### TypeScript
-```bash
-npm test
-```
-
-### Python
-```bash
-cd python
-pytest
-```
-
-## Examples
-
-See `/examples` directory for:
-- Basic usage patterns
-- LangGraph integration examples
-- Error handling strategies
-- Custom configuration options
 
 ## Requirements
 
-- Claude Code CLI must be installed and available in PATH
-- Node.js 20+ (for TypeScript version)
-- Python 3.8+ (for Python version)
+- Claude Code CLI installed and in PATH
+- Authenticated Claude session (`~/.claude/.credentials.json`)
+- Node.js 20+ (TypeScript) or Python 3.8+ (Python)
+
+## Error Handling
+
+Handles timeouts, buffer overflows, process failures, and low credit balance errors. Supports configurable retry logic with exponential backoff.
+
+## SEO Keywords
+
+Claude subscription, Claude headless mode, Claude programmatic access, Claude without API key, Claude automation, Claude batch processing, affordable Claude API alternative, Claude Code headless, Claude subscription billing
 
 ## License
 
@@ -234,4 +114,4 @@ MIT
 
 ## Contributing
 
-Contributions welcome! Please open an issue or PR.
+Contributions welcome! Open an issue or PR at [github.com/biosphere-labs/claude-headless-subscription](https://github.com/biosphere-labs/claude-headless-subscription)

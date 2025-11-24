@@ -10,13 +10,13 @@ else:
     long_description = "LangGraph node for calling Claude Code in headless mode"
 
 setup(
-    name="claude-langgraph-headless",
+    name="claude-headless-subscription",
     version="1.0.0",
-    author="",
-    description="LangGraph node for calling Claude Code in headless mode",
+    author="Biosphere Labs",
+    description="Use Claude Code programmatically via subscription instead of expensive API credits",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/biosphere-labs/claude-langgraph-headless",
+    url="https://github.com/biosphere-labs/claude-headless-subscription",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",

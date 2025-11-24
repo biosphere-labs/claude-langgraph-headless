@@ -1,12 +1,12 @@
 {
-  "name": "@biosphere-labs/claude-langgraph-headless",
+  "name": "@biosphere-labs/claude-headless-subscription",
   "version": "1.0.0",
-  "description": "LangGraph node for calling Claude Code in headless mode - TypeScript and Python implementations",
+  "description": "Use Claude Code programmatically via subscription instead of expensive API credits - TypeScript and Python",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/biosphere-labs/claude-langgraph-headless.git"
+    "url": "https://github.com/biosphere-labs/claude-headless-subscription.git"
   },
   "publishConfig": {
     "@biosphere-labs:registry": "https://npm.pkg.github.com"
@@ -20,9 +20,14 @@
   "keywords": [
     "claude",
     "claude-code",
-    "langgraph",
+    "claude-subscription",
     "headless",
+    "programmatic",
     "anthropic",
+    "subscription-billing",
+    "no-api-key",
+    "claude-automation",
+    "langgraph",
     "ai",
     "llm"
   ],

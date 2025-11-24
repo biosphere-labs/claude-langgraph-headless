@@ -3,7 +3,7 @@
 import pytest
 import subprocess
 import asyncio
-from claude_langgraph_headless import (
+from claude_headless_subscription import (
     ClaudeHeadlessExecutor,
     ClaudeHeadlessNode,
     ClaudeHeadlessOptions,
