@@ -60,8 +60,20 @@ class ClaudeHeadlessExecutor:
     async def _spawn_claude_process(self, temp_path: str) -> ClaudeHeadlessOutput:
         """Spawn Claude process using Popen for better control"""
 
-        # Build command
-        args = ["claude", "-p", "--output-format", self.options.output_format]
+        # Build command with --settings flag to force subscription auth
+        import json
+        settings_flag = {
+            "env": {
+                "ANTHROPIC_API_KEY": ""
+            }
+        }
+
+        args = [
+            "claude",
+            "-p",
+            "--output-format", self.options.output_format,
+            "--settings", json.dumps(settings_flag)
+        ]
 
         # Set up environment
         env = os.environ.copy()
