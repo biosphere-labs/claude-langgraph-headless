@@ -1,7 +1,13 @@
 from setuptools import setup, find_packages
+import os
 
-with open("../README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+# Get the path to README.md
+readme_path = os.path.join(os.path.dirname(__file__), "..", "README.md")
+if os.path.exists(readme_path):
+    with open(readme_path, "r", encoding="utf-8") as fh:
+        long_description = fh.read()
+else:
+    long_description = "LangGraph node for calling Claude Code in headless mode"
 
 setup(
     name="claude-langgraph-headless",
@@ -10,7 +16,7 @@ setup(
     description="LangGraph node for calling Claude Code in headless mode",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/claude-langgraph-headless",
+    url="https://github.com/biosphere-labs/claude-langgraph-headless",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",

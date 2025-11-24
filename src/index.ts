@@ -92,7 +92,19 @@ export class ClaudeHeadlessExecutor {
     tempFile: string
   ): Promise<ClaudeHeadlessOutput> {
     return new Promise((resolve, reject) => {
-      const args = ["-p", "--output-format", this.options.outputFormat];
+      // Use interactive mode with -p and --settings to use subscription
+      const settingsFlag = {
+        env: {
+          // Force subscription mode by clearing API key
+          ANTHROPIC_API_KEY: "",
+        }
+      };
+
+      const args = [
+        "-p",
+        "--output-format", this.options.outputFormat,
+        "--settings", JSON.stringify(settingsFlag)
+      ];
 
       // Set up environment - unset API key if using subscription
       const env = { ...process.env };
